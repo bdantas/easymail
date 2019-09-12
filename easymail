@@ -118,7 +118,7 @@ build_eml_file()
 Content-Type: multipart/mixed; boundary=\"----7II5XTH4IPXG2QZOY8LJF98QQX4IR3\"
 Content-Transfer-Encoding: 8bit
 Subject: $subject
-From: Easymail <easymail@suckless.nix>
+From: Easymail <easymail@unixrules.nix>
 Date: $(date)
 To: $header_destination
 
