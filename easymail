@@ -1,0 +1,153 @@
+#!/bin/sh
+
+# user variables:
+host='smtps://example.com'
+port='443'
+user='Bob'
+password="yourEmailPassword"
+userland=gnulinux_coreutils # options: gnulinux_coreutils, gnulinux_busybox, openbsd_gcoreutils
+
+main()
+{
+	# internal variables
+	attachments_file=$(mktemp)
+	eml_file=$(mktemp)
+
+	get_commandline_options "$@"
+	[ -z "$body" ] && get_stdin
+	build_eml_file
+	send_eml_file
+}
+
+show_usage()
+{
+	echo "Usage: easymail -d <destination> [-s <subject>] [-b <body>] [-a <attachment>]
+
+Notes:
+ - destination: an email address (if multiple, precede each one with -d)
+ - subject: a string
+ - body: stdin, -b string, or -b file. examples:
+	 1. echo 'some string' | easymail
+	 2. easymail </path/to/some-text-file
+	 3. easymail -b 'some string'
+	 4. easymail -b /path/to/some-text-file
+ - attachment: a file (if multiple, precede each one with -a)
+
+Example:
+ easymail -d somebody@somewhere.com -s 'UNIX' -b 'UNIX is fun!' -a K&RC.pdf"
+}
+
+attach()
+{
+	# append a header for the attachment 
+	filename="$(basename "$1")"
+	echo "------7II5XTH4IPXG2QZOY8LJF98QQX4IR3
+Content-Transfer-Encoding: base64
+Content-Type: application/octet-stream;
+ name=\"$filename\"
+Content-Disposition: attachment;
+ filename=\"$filename\";
+" >>$attachments_file
+
+	# encode and append the attachment
+	case "$userland" in
+		gnulinux_coreutils) cat "$1" | base64 >>$attachments_file ;;
+		gnulinux_busybox) cat "$1" | openssl enc -base64 >>$attachments_file ;;
+		openbsd_gcoreutils) cat "$1" | b64encode poop | tail -n +2 >>$attachments_file ;;
+	esac
+}
+
+cleanup()
+{
+	rm -f $eml_file $attachments_file
+}
+trap cleanup EXIT HUP TERM INT
+
+get_stdin()
+{
+	# save stdin contents (if any)
+	case "$userland" in
+		gnulinux_coreutils) body="$(timeout 1 dd bs=1 count=1 2>/dev/null && cat)" ;; 
+		gnulinux_busybox) body="$(timeout -t 1 dd bs=1 count=1 2>/dev/null && cat)" ;;
+		openbsd_gcoreutils) body="$(gtimeout 1 dd bs=1 count=1 2>/dev/null && cat)" ;;
+	esac
+
+	# dd has 1 sec to get 1 byte, which is plenty of time if there is data
+	# in stdin waiting to be read. If dd succeeds, it passes its byte to stdout
+	# and triggers cat, which has unlimited time to get remaining data.
+	# This seems complicated but is necessary: using just cat causes script to 
+	# hang if there is no data in stdin.
+}
+
+get_commandline_options()
+{
+	while [ "$#" -gt 0 ]; do
+		case "$1" in
+			-d)	
+				curl_destination="${curl_destination}--mail-rcpt $2 "
+				header_destination="${header_destination}$2, "
+				shift 2
+				;;
+			-s) 
+				subject="$2"
+				shift 2
+				;;
+			-b) 
+				body="$2"
+				shift 2
+				;;
+			-a) 
+				attach "$2"
+				shift 2
+				;;
+			-*)
+				echo "Invalid option: $1"
+				shift
+				;;
+			*)
+				shift
+				;;
+		esac
+	done
+}
+
+build_eml_file()
+{
+	# create header
+	echo "MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary=\"----7II5XTH4IPXG2QZOY8LJF98QQX4IR3\"
+Content-Transfer-Encoding: 8bit
+Subject: $subject
+From: Easymail <easymail@suckless.nix>
+Date: $(date)
+To: $header_destination
+
+------7II5XTH4IPXG2QZOY8LJF98QQX4IR3
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+ charset=UTF-8
+" >$eml_file
+
+	# append body
+	if [ -f "$body" ]; then
+		cat "$body" >>$eml_file
+	else
+		echo "$body" >>$eml_file
+	fi
+
+	# append attachment(s) if applicable
+	if [ -f "$attachments_file" ]; then
+		cat "$attachments_file" >>$eml_file
+	fi
+}
+
+send_eml_file()
+{
+	curl --url ${host}:${port} --ssl-reqd --upload-file $eml_file $curl_destination --user ${user}:${password} >/dev/null 2>&1
+}
+
+if [ "$#" -le 1 ]; then
+	show_usage
+else
+	main "$@"
+fi
