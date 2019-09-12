@@ -5,7 +5,7 @@ host='smtps://example.com'
 port='443'
 user='Bob'
 password="yourEmailPassword"
-userland=gnulinux_coreutils # options: gnulinux_coreutils, gnulinux_busybox, openbsd_gcoreutils
+userland=gnulinux_coreutils # options: gnulinux_coreutils, gnulinux_busybox, openbsd_coreutils
 
 main()
 {
@@ -53,7 +53,7 @@ Content-Disposition: attachment;
 	case "$userland" in
 		gnulinux_coreutils) cat "$1" | base64 >>$attachments_file ;;
 		gnulinux_busybox) cat "$1" | openssl enc -base64 >>$attachments_file ;;
-		openbsd_gcoreutils) cat "$1" | b64encode poop | tail -n +2 >>$attachments_file ;;
+		openbsd_coreutils) cat "$1" | b64encode poop | tail -n +2 >>$attachments_file ;;
 	esac
 }
 
@@ -69,7 +69,7 @@ get_stdin()
 	case "$userland" in
 		gnulinux_coreutils) body="$(timeout 1 dd bs=1 count=1 2>/dev/null && cat)" ;; 
 		gnulinux_busybox) body="$(timeout -t 1 dd bs=1 count=1 2>/dev/null && cat)" ;;
-		openbsd_gcoreutils) body="$(gtimeout 1 dd bs=1 count=1 2>/dev/null && cat)" ;;
+		openbsd_coreutils) body="$(gtimeout 1 dd bs=1 count=1 2>/dev/null && cat)" ;;
 	esac
 
 	# dd has 1 sec to get 1 byte, which is plenty of time if there is data
