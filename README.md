@@ -11,9 +11,9 @@ Run the script without any arguments for syntax and example usage.
 It works on GNU/Linux with coreutils, GNU/Linux with busybox, and OpenBSD. 
 
 # Dependencies:
-GNU/Linux with coreutils: curl
-GNU/Linux with busybox: curl and openssl
-OpenBSD: curl and coreutils
+- GNU/Linux with coreutils: curl
+- GNU/Linux with busybox: curl and openssl
+- OpenBSD: curl and coreutils
 
 # BusyBox gotcha:
 BusyBox recently changed the syntax of its *timeout* applet. Run *busybox timeout --help* to check the syntax for your version of BusyBox. If your version does not take the *-t* flag, please delete those two characters from the *get_stdin* function.
