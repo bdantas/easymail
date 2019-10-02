@@ -1,5 +1,5 @@
 # easymail
-Send email from shell scripts or command line as simply as possible.
+Send email from shell scripts or the command line
 
 # Purpose:
 To send email from shell scripts or command line without needing to install an MTA such as exim or postfix. All you need to do is adjust the user variables at the top of the script, put the script somewhere in your PATH, and make it executable.
