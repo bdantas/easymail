@@ -13,7 +13,7 @@ Run the script without any arguments for syntax and example usage.
 - OpenBSD: curl and coreutils
 
 # BusyBox gotcha
-BusyBox recently changed the syntax of its *timeout* applet. Run *busybox timeout --help* to check the syntax for your version of BusyBox. If your version does not take the *-t* flag, please delete those two characters from the *get_stdin* function.
+BusyBox recently changed the syntax of its *timeout* applet. If your version of BusyBox is 1.30.0 or newer, change *timeout -t 1* on line 74 to *timeout 1*
 
 # Note about CA ssl certificates
 If they are missing on your system (which is not advisable), you can still use this script. Just add *--insecure* to the curl command in the *send_eml_file* function.
