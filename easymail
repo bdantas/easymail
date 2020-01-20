@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# easymail v4.5
+# easymail v5.0
 # Bruno "GNUser" Dantas GPLv3
 
 # user variables:
@@ -70,11 +70,18 @@ get_stdin()
 {
 	# save stdin contents (if any)
 	case "$userland" in
-		gnulinux_coreutils) body="$(timeout 1 dd bs=1 count=1 2>/dev/null && cat)" ;; 
-		gnulinux_busybox) body="$(timeout -t 1 dd bs=1 count=1 2>/dev/null && cat)" ;;
-		openbsd_coreutils) body="$(gtimeout 1 dd bs=1 count=1 2>/dev/null && cat)" ;;
+		gnulinux_coreutils) 
+			body="$(timeout 1 dd bs=1 count=1 2>/dev/null && cat)" 
+			;; 
+		gnulinux_busybox) 
+			timeout --help 2>&1 | grep -q -- '-t' && flag='-t' # only older versions of BB (older than 1.30) need '-t' flag
+			body="$(timeout $flag 1 dd bs=1 count=1 2>/dev/null && cat)"
+			;;
+		openbsd_coreutils) 
+			body="$(gtimeout 1 dd bs=1 count=1 2>/dev/null && cat)" 
+			;;
 	esac
-
+	
 	# dd has 1 sec to get 1 byte, which is plenty of time if there is data
 	# in stdin waiting to be read. If dd succeeds, it passes its byte to stdout
 	# and triggers cat, which has unlimited time to get remaining data.
