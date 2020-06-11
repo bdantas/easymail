@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# easymail v5.0
+# easymail v5.1
 # Bruno "GNUser" Dantas GPLv3
 
 # user variables:
@@ -74,7 +74,7 @@ get_stdin()
 			body="$(timeout 1 dd bs=1 count=1 2>/dev/null && cat)" 
 			;; 
 		gnulinux_busybox) 
-			timeout --help 2>&1 | fgrep -q '[-t SECS]' && flag='-t' # versions of busybox older than 1.30 need '-t' flag
+			timeout --help 2>&1 | grep -Fq '[-t SECS]' && flag='-t' # versions of busybox older than 1.30 need '-t' flag
 			body="$(timeout $flag 1 dd bs=1 count=1 2>/dev/null && cat)"
 			;;
 		openbsd_coreutils) 
