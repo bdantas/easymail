@@ -8,7 +8,7 @@ To send email from shell scripts or command line without needing to install an M
 Run the script without any arguments for syntax and example usage.
 
 # Dependencies
-- **GNU/Linux** (both BusyBox and coreutils userland work fine)
+- **\*nix** (tested and working in GNU/Linux with BusyBox, GNU/Linux with coreutils, and Android/Linux with Termux)
 - **curl**
 
 # Note about CA ssl certificates
