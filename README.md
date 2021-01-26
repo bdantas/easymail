@@ -8,9 +8,8 @@ To send email from shell scripts or command line without needing to install an M
 Run the script without any arguments for syntax and example usage.
 
 # Dependencies
-- GNU/Linux with coreutils: curl
-- GNU/Linux with busybox: curl and openssl
-- OpenBSD: curl and coreutils
+- **GNU/Linux** (both BusyBox and coreutils userland work fine)
+- **curl**
 
 # Note about CA ssl certificates
 If they are missing on your system (which is not advisable), you can still use this script. Just add *--insecure* to the curl command in the *send_eml_file* function.
