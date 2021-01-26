@@ -1,14 +1,13 @@
 #!/bin/sh
 
-# easymail v5.1
+# easymail v6.0
 # Bruno "GNUser" Dantas GPLv3
 
 # user variables:
-host='smtps://example.com'
+host='smtps://smtps-proxy.fastmail.com'
 port='443'
-user='Bob'
-password="yourEmailPassword"
-userland=gnulinux_coreutils # options: gnulinux_coreutils, gnulinux_busybox, openbsd_coreutils
+user='dantas@airpost.net'
+password="zy6xe4xaclc4v733"
 
 main()
 {
@@ -53,11 +52,7 @@ Content-Disposition: attachment;
 " >>$attachments_file
 
 	# encode and append the attachment
-	case "$userland" in
-		gnulinux_coreutils) cat "$1" | base64 >>$attachments_file ;;
-		gnulinux_busybox) cat "$1" | openssl enc -base64 >>$attachments_file ;;
-		openbsd_coreutils) cat "$1" | b64encode poop | tail -n +2 >>$attachments_file ;;
-	esac
+	cat "$1" | base64 >>$attachments_file
 }
 
 cleanup()
@@ -68,20 +63,8 @@ trap cleanup EXIT HUP TERM INT
 
 get_stdin()
 {
-	# save stdin contents (if any)
-	case "$userland" in
-		gnulinux_coreutils) 
-			body="$(timeout 1 dd bs=1 count=1 2>/dev/null && cat)" 
-			;; 
-		gnulinux_busybox) 
-			timeout --help 2>&1 | grep -Fq '[-t SECS]' && flag='-t' # versions of busybox older than 1.30 need '-t' flag
-			body="$(timeout $flag 1 dd bs=1 count=1 2>/dev/null && cat)"
-			;;
-		openbsd_coreutils) 
-			body="$(gtimeout 1 dd bs=1 count=1 2>/dev/null && cat)" 
-			;;
-	esac
-	
+		body="$(timeout 1 dd bs=1 count=1 2>/dev/null && cat)"
+
 	# dd has 1 sec to get 1 byte, which is plenty of time if there is data
 	# in stdin waiting to be read. If dd succeeds, it passes its byte to stdout
 	# and triggers cat, which has unlimited time to get remaining data.
