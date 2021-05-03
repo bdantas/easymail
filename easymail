@@ -6,8 +6,8 @@
 # user variables:
 host='smtps://smtps-proxy.fastmail.com'
 port='443'
-user='dantas@airpost.net'
-password="zy6xe4xaclc4v733"
+user='bob@somedomain.net'
+password="myPassworD"
 
 main()
 {
