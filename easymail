@@ -112,7 +112,7 @@ Content-Type: multipart/mixed; boundary=\"----7II5XTH4IPXG2QZOY8LJF98QQX4IR3\"
 Content-Transfer-Encoding: 8bit
 Subject: $subject
 From: Easymail <easymail@unixrules.nix>
-Date: $(date)
+Date: $(date -R)
 To: $header_destination
 
 ------7II5XTH4IPXG2QZOY8LJF98QQX4IR3
