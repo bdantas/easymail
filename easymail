@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# easymail v6.1
+# easymail v6.2
 # Bruno "GNUser" Dantas GPLv3
 
 # user variables:
@@ -43,7 +43,7 @@ attach()
 {
 	# append a header for the attachment 
 	filename="$(basename "$1")"
-	echo "------7II5XTH4IPXG2QZOY8LJF98QQX4IR3
+	echo "------0123456789ABCDEFGHIJ0123456789
 Content-Transfer-Encoding: base64
 Content-Type: application/octet-stream;
  name=\"$filename\"
@@ -108,14 +108,14 @@ build_eml_file()
 {
 	# create header
 	echo "MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary=\"----7II5XTH4IPXG2QZOY8LJF98QQX4IR3\"
+Content-Type: multipart/mixed; boundary=\"----0123456789ABCDEFGHIJ0123456789\"
 Content-Transfer-Encoding: 8bit
 Subject: $subject
 From: Easymail <easymail@unixrules.nix>
 Date: $(date -R)
 To: $header_destination
 
-------7II5XTH4IPXG2QZOY8LJF98QQX4IR3
+------0123456789ABCDEFGHIJ0123456789
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain;
  charset=UTF-8
