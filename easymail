@@ -4,8 +4,8 @@
 # Bruno "GNUser" Dantas GPLv3
 
 # user variables:
-host='smtps://smtps-proxy.fastmail.com'
-port='443'
+host='smtps://smtps.fastmail.com'
+port='465'
 user='bob@somedomain.net'
 password="myPassworD"
 
