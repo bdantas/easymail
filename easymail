@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# easymail v6.2
+# easymail v6.3
 # Bruno "GNUser" Dantas GPLv3
 
 # user variables:
@@ -23,7 +23,7 @@ main()
 
 show_usage()
 {
-	echo "Usage: easymail -d <destination> [-s <subject>] [-b <body>] [-a <attachment>]
+	echo "Usage: easymail -d <destination> [-s <subject>] [-b <body>] [-a <attachment>] [-f <name>]
 
 Notes:
  - destination: an email address (if multiple, precede each one with -d)
@@ -34,9 +34,10 @@ Notes:
 	 3. easymail -b 'some string'
 	 4. easymail -b /path/to/some-text-file
  - attachment: a file (if multiple, precede each one with -a)
+ - name: a string
 
 Example:
- easymail -d somebody@somewhere.com -s 'UNIX' -b 'UNIX is fun!' -a K&RC.pdf"
+ easymail -d somebody@somewhere.com -s 'UNIX' -b 'UNIX is fun!' -a K&RC.pdf" -f 'John Doe'
 }
 
 attach()
@@ -93,6 +94,10 @@ get_commandline_options()
 				attach "$2"
 				shift 2
 				;;
+			-f) 
+				from="$2"
+				shift 2
+				;;
 			-*)
 				echo "Invalid option: $1"
 				shift
@@ -111,7 +116,7 @@ build_eml_file()
 Content-Type: multipart/mixed; boundary=\"----0123456789ABCDEFGHIJ0123456789\"
 Content-Transfer-Encoding: 8bit
 Subject: $subject
-From: Easymail <easymail@unixrules.nix>
+From: $from <$user>
 Date: $(date -R)
 To: $header_destination
 
