@@ -7,6 +7,7 @@
 host='smtps://smtps-proxy.fastmail.com'
 port='443'
 user='bob@somedomain.net'
+user_name='Robert'
 password="myPassworD"
 
 main()
@@ -111,7 +112,7 @@ build_eml_file()
 Content-Type: multipart/mixed; boundary=\"----0123456789ABCDEFGHIJ0123456789\"
 Content-Transfer-Encoding: 8bit
 Subject: $subject
-From: Easymail <easymail@unixrules.nix>
+From: $user_name $user
 Date: $(date -R)
 To: $header_destination
 
