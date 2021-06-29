@@ -1,12 +1,12 @@
 #!/bin/sh
 
-# easymail v6.3
+# easymail v6.4
 # Bruno "GNUser" Dantas GPLv3
 
-# user variables:
+# user-specific SMTP settings:
 host='smtps://smtp.fastmail.com'
 port='465'
-user='john@somedomain.net'
+username='john@somedomain.net'
 password="myPassworD"
 
 main()
@@ -23,23 +23,25 @@ main()
 
 show_usage()
 {
-	echo "Version: 6.3
+	echo "Version: 6.4
 
-Usage: $ easymail -d <destination> [-s <subject>] [-b <body>] [-a <attachment>] [-f <name>]
+Usage: $ easymail -d <destination> [-s <subject>] [-b <body>] [-a <attachment>] [-f <name>] [-r <address>]
 
 Notes:
- - destination: an email address (if multiple, precede each one with -d)
- - subject: a string
- - body: stdin, -b string, or -b file. examples:
+ - the options in square brackets are optional
+ - destination = an email address (if multiple, precede each one with -d)
+ - subject = a string
+ - body = stdin by default, use -b to specify a string or filename; all of these work:
 	 1. echo 'some string' | easymail
 	 2. easymail </path/to/some-text-file
 	 3. easymail -b 'some string'
 	 4. easymail -b /path/to/some-text-file
- - attachment: a file (if multiple, precede each one with -a)
- - name: a string to use in the 'From:' field
+ - attachment = a filename (if multiple, precede each one with -a)
+ - name = a name to use in the 'From:' field (default is none)
+ - address = a return address to use in the 'From:' field (default is $username)
 
 Usage example:
- $ easymail -d somebody@somewhere.com -s 'UNIX' -b 'UNIX is fun!' -a K&RC.pdf -f 'John Doe'"
+ $ easymail -d somebody@somewhere.com -s 'UNIX' -b 'UNIX is fun!' -a K&RC.pdf -f 'John Doe' -r 'foo@bar.com'"
 }
 
 attach()
@@ -100,6 +102,10 @@ get_commandline_options()
 				from="$2"
 				shift 2
 				;;
+			-r) 
+				return_address="$2"
+				shift 2
+				;;
 			-*)
 				echo "Invalid option: $1"
 				shift
@@ -113,12 +119,15 @@ get_commandline_options()
 
 build_eml_file()
 {
+	# if user did not specify a return address, use the one associated with email account:
+	[ -z $return_address ] && return_address="$username"
+
 	# create header
 	echo "MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary=\"----0123456789ABCDEFGHIJ0123456789\"
 Content-Transfer-Encoding: 8bit
 Subject: $subject
-From: $from <$user>
+From: $from <$return_address>
 Date: $(date -R)
 To: $header_destination
 
@@ -143,7 +152,7 @@ Content-Type: text/plain;
 
 send_eml_file()
 {
-	curl --url ${host}:${port} --ssl-reqd --upload-file $eml_file $curl_destination --user ${user}:${password} >/dev/null 2>&1
+	curl --url ${host}:${port} --ssl-reqd --upload-file $eml_file $curl_destination --user ${username}:${password} >/dev/null 2>&1
 }
 
 if [ "$#" -le 1 ]; then
