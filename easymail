@@ -112,7 +112,7 @@ build_eml_file()
 Content-Type: multipart/mixed; boundary=\"----0123456789ABCDEFGHIJ0123456789\"
 Content-Transfer-Encoding: 8bit
 Subject: $subject
-From: $user_name $user
+From: $user_name <$user>
 Date: $(date -R)
 To: $header_destination
 
