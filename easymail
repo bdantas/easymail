@@ -37,7 +37,7 @@ Notes:
  - name: a string to use in the 'From:' field
 
 Example:
- easymail -d somebody@somewhere.com -s 'UNIX' -b 'UNIX is fun!' -a K&RC.pdf" -f 'John Doe'
+ easymail -d somebody@somewhere.com -s 'UNIX' -b 'UNIX is fun!' -a K&RC.pdf -f 'John Doe'"
 }
 
 attach()
