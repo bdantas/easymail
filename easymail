@@ -4,7 +4,7 @@
 # Bruno "GNUser" Dantas GPLv3
 
 # user variables:
-host='smtps://smtps.fastmail.com'
+host='smtps://smtp.fastmail.com'
 port='465'
 user='bob@somedomain.net'
 password="myPassworD"
