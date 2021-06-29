@@ -34,7 +34,7 @@ Notes:
 	 3. easymail -b 'some string'
 	 4. easymail -b /path/to/some-text-file
  - attachment: a file (if multiple, precede each one with -a)
- - name: a string
+ - name: a string to use in the 'From:' field
 
 Example:
  easymail -d somebody@somewhere.com -s 'UNIX' -b 'UNIX is fun!' -a K&RC.pdf" -f 'John Doe'
