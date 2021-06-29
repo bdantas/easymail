@@ -6,7 +6,7 @@
 # user variables:
 host='smtps://smtp.fastmail.com'
 port='465'
-user='bob@somedomain.net'
+user='john@somedomain.net'
 password="myPassworD"
 
 main()
