@@ -23,7 +23,9 @@ main()
 
 show_usage()
 {
-	echo "Usage: easymail -d <destination> [-s <subject>] [-b <body>] [-a <attachment>] [-f <name>]
+	echo "Version: 6.3
+
+Usage: $ easymail -d <destination> [-s <subject>] [-b <body>] [-a <attachment>] [-f <name>]
 
 Notes:
  - destination: an email address (if multiple, precede each one with -d)
@@ -36,8 +38,8 @@ Notes:
  - attachment: a file (if multiple, precede each one with -a)
  - name: a string to use in the 'From:' field
 
-Example:
- easymail -d somebody@somewhere.com -s 'UNIX' -b 'UNIX is fun!' -a K&RC.pdf -f 'John Doe'"
+Usage example:
+ $ easymail -d somebody@somewhere.com -s 'UNIX' -b 'UNIX is fun!' -a K&RC.pdf -f 'John Doe'"
 }
 
 attach()
