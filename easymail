@@ -72,7 +72,7 @@ trap cleanup EXIT HUP TERM INT
 
 get_stdin()
 {
-		body="$(timeout 1 dd bs=1 count=1 2>/dev/null && cat)"
+	body="$(timeout 1 dd bs=1 count=1 2>/dev/null && cat)"
 
 	# dd has 1 sec to get 1 byte, which is plenty of time if there is data
 	# in stdin waiting to be read. If dd succeeds, it passes its byte to stdout
