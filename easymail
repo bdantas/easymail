@@ -1,13 +1,17 @@
 #!/bin/sh
 
-# easymail v6.4
-# Bruno "GNUser" Dantas GPLv3
+easymail_version=6.5
 
 # user-specific SMTP settings:
-host='smtps://smtp.fastmail.com'
-port='465'
-username='john@somedomain.net'
-password="myPassworD"
+host=smtps://smtp.fastmail.com
+port=465
+username=john@privacy.com
+password=myPassworD
+
+# user-specific "From" settings:
+# (note: these fields are cosmetic and can be anything you want the human recipient to see)
+from="John Doe"
+return_address="$username"
 
 main()
 {
@@ -23,7 +27,7 @@ main()
 
 show_usage()
 {
-	echo "Version: 6.4
+	echo "Version: $easymail_version
 
 Usage: $ easymail -d <destination> [-s <subject>] [-b <body>] [-a <attachment>] [-f <name>] [-r <address>]
 
@@ -32,16 +36,16 @@ Notes:
  - destination = an email address (if multiple, precede each one with -d)
  - subject = a string
  - body = stdin by default, use -b to specify a string or filename; all of these work:
-	 1. echo 'some string' | easymail
-	 2. easymail </path/to/some-text-file
-	 3. easymail -b 'some string'
-	 4. easymail -b /path/to/some-text-file
+	 $ echo \"some string\" | easymail
+	 $ easymail </path/to/some-text-file
+	 $ easymail -b \"some string\"
+	 $ easymail -b /path/to/some-text-file
  - attachment = a filename (if multiple, precede each one with -a)
- - name = a name to use in the 'From:' field (default is none)
- - address = a return address to use in the 'From:' field (default is $username)
+ - name = a name to use in the \"From:\" field (default is $from)
+ - address = a return address to use in the \"From:\" field (default is $username)
 
 Usage example:
- $ easymail -d somebody@somewhere.com -s 'UNIX' -b 'UNIX is fun!' -a K&RC.pdf -f 'John Doe' -r 'foo@bar.com'"
+ $ easymail -d somebody@somewhere.com -s \"UNIX\" -b \"UNIX is fun\" -a K&RC.pdf -f \"Jane Doe\" -r jane@privacy.com"
 }
 
 attach()
@@ -54,15 +58,15 @@ Content-Type: application/octet-stream;
  name=\"$filename\"
 Content-Disposition: attachment;
  filename=\"$filename\";
-" >>$attachments_file
+" >>"$attachments_file"
 
 	# encode and append the attachment
-	cat "$1" | base64 >>$attachments_file
+	base64 "$1" >>"$attachments_file"
 }
 
 cleanup()
 {
-	rm -f $eml_file $attachments_file
+	rm -f "$eml_file" "$attachments_file"
 }
 trap cleanup EXIT HUP TERM INT
 
@@ -119,9 +123,6 @@ get_commandline_options()
 
 build_eml_file()
 {
-	# if user did not specify a return address, use the one associated with email account:
-	[ -z $return_address ] && return_address="$username"
-
 	# create header
 	echo "MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary=\"----0123456789ABCDEFGHIJ0123456789\"
@@ -135,24 +136,24 @@ To: $header_destination
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain;
  charset=UTF-8
-" >$eml_file
+" >"$eml_file"
 
 	# append body
 	if [ -f "$body" ]; then
-		cat "$body" >>$eml_file
+		cat "$body" >>"$eml_file"
 	else
-		echo "$body" >>$eml_file
+		echo "$body" >>"$eml_file"
 	fi
 
 	# append attachment(s) if applicable
 	if [ -f "$attachments_file" ]; then
-		cat "$attachments_file" >>$eml_file
+		cat "$attachments_file" >>"$eml_file"
 	fi
 }
 
 send_eml_file()
 {
-	curl --url ${host}:${port} --ssl-reqd --upload-file $eml_file $curl_destination --user ${username}:${password} >/dev/null 2>&1
+	curl --url "$host":"$port" --ssl-reqd --upload-file "$eml_file" "$curl_destination" --user "$username":"$password" >/dev/null 2>&1
 }
 
 if [ "$#" -le 1 ]; then
