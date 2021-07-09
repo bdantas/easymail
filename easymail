@@ -1,17 +1,21 @@
 #!/bin/sh
 
-easymail_version=6.5
+easymail_version=7.0
 
-# user-specific SMTP settings:
+########## user variables ##########
+# SMTP settings:
 host=smtps://smtp.fastmail.com
 port=465
-username=john@privacy.com
+username=john@privacy.com # email address or just a username, depending on your server/provider settings
 password=myPassworD
 
-# user-specific "From" settings:
-# (note: these fields are cosmetic and can be anything you want the human recipient to see)
+# "From" field settings (cosmetic, can be anything you want the human recipient to see):
 from="John Doe"
 return_address="$username"
+
+# If you want to sign emails AND your private signing key is protected by a passphrase (otherwise, ok to leave blank):
+signature_passphrase=
+####################################
 
 main()
 {
@@ -27,11 +31,12 @@ main()
 
 show_usage()
 {
-	echo "Version: $easymail_version
+	echo "EASYMAIL VERSION: $easymail_version
 
-Usage: $ easymail -d <destination> [-s <subject>] [-b <body>] [-a <attachment>] [-f <name>] [-r <address>]
+SYNTAX:
+  $ easymail -d <destination> [-s <subject>] [-b <body>] [-a <attachment>] [-f <name>] [-r <address>] [-e|-g]
 
-Notes:
+BASIC USAGE:
  - the options in square brackets are optional
  - destination = an email address (if multiple, precede each one with -d)
  - subject = a string
@@ -44,8 +49,21 @@ Notes:
  - name = a name to use in the \"From:\" field (default is $from)
  - address = a return address to use in the \"From:\" field (default is $return_address)
 
-Usage example:
- $ easymail -d somebody@somewhere.com -s \"UNIX\" -b \"UNIX is fun\" -a K&RC.pdf -f \"Jane Doe\" -r jane@privacy.com"
+ADVANCED USAGE (-e and -g options):
+ - use the -e option to encrypt the body of your email
+ - use the -g option to encrypt and sign the body of your email
+ - encryption and signing of attachments is not supported at this time
+ - these options make the following reasonable assumptions:
+	1. gpg2 is available in your PATH (distro package may be called gpg, gpg2, or gnupg)
+	2. you have imported the recipient's public encryption key to your gpg2 keychain
+	3. the identity associated with recipient's public encryption key is their email address
+	4. your email has a single recipient
+ - if you want to sign your email and your private signing key is locked with a passphrase, you
+    need to provide signature_passphrase in the \"user variables\" section at the top of this script
+ - this warning is benign, just ignore it: \"gpg: selecting openpgp failed: No such device\"
+
+USAGE EXAMPLE:
+ $ easymail -d somebody@somewhere.com -s \"UNIX\" -b \"UNIX is fun\" -a K&RC.pdf"
 }
 
 attach()
@@ -88,6 +106,7 @@ get_commandline_options()
 			-d)	
 				curl_destination="${curl_destination}--mail-rcpt $2 "
 				header_destination="${header_destination}$2, "
+				recipient="$2"
 				shift 2
 				;;
 			-s) 
@@ -109,6 +128,19 @@ get_commandline_options()
 			-r) 
 				return_address="$2"
 				shift 2
+				;;
+			-e)
+				encryption=yes
+				shift
+				;;
+			-g)
+				encryption=yes
+				if [ -n "$signature_passphrase" ]; then
+					sign_args="--sign --pinentry-mode=loopback --passphrase=$signature_passphrase"
+				else
+					sign_args="--sign"
+				fi
+				shift
 				;;
 			-*)
 				echo "Invalid option: $1"
@@ -139,10 +171,20 @@ Content-Type: text/plain;
 " >"$eml_file"
 
 	# append body
-	if [ -f "$body" ]; then
-		cat "$body" >>"$eml_file"
+	if [ "$encryption" = "yes" ]; then 
+		if [ -f "$body" ]; then
+			cat "$body" | eval gpg2 --encrypt --armor --recipient "$recipient" "$sign_args" | tee /tmp/body.gpg >>"$eml_file"
+			attach /tmp/body.gpg
+		else
+			echo "$body" | eval gpg2 --encrypt --armor --recipient "$recipient" "$sign_args" | tee /tmp/body.gpg >>"$eml_file"
+			attach /tmp/body.gpg
+		fi
 	else
-		echo "$body" >>"$eml_file"
+		if [ -f "$body" ]; then
+			cat "$body" >>"$eml_file"
+		else
+			echo "$body" >>"$eml_file"
+		fi
 	fi
 
 	# append attachment(s) if applicable
