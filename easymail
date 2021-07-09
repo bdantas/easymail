@@ -1,6 +1,6 @@
 #!/bin/sh
 
-easymail_version=7.0
+easymail_version=7.1
 
 ########## user variables ##########
 # SMTP settings:
@@ -60,7 +60,7 @@ ADVANCED USAGE (-e and -g options):
 	4. your email has a single recipient
  - if you want to sign your email and your private signing key is locked with a passphrase, you
     need to provide signature_passphrase in the \"user variables\" section at the top of this script
- - this warning is benign, just ignore it: \"gpg: selecting openpgp failed: No such device\"
+ - this signing warning is benign, just ignore it: \"gpg: selecting openpgp failed: No such device\"
 
 USAGE EXAMPLE:
  $ easymail -d somebody@somewhere.com -s \"UNIX\" -b \"UNIX is fun\" -a K&RC.pdf"
@@ -173,11 +173,9 @@ Content-Type: text/plain;
 	# append body
 	if [ "$encryption" = "yes" ]; then 
 		if [ -f "$body" ]; then
-			cat "$body" | eval gpg2 --encrypt --armor --recipient "$recipient" "$sign_args" | tee /tmp/body.gpg >>"$eml_file"
-			attach /tmp/body.gpg
+			cat "$body" | eval gpg2 --encrypt --armor --recipient "$recipient" "$sign_args" >>"$eml_file"
 		else
-			echo "$body" | eval gpg2 --encrypt --armor --recipient "$recipient" "$sign_args" | tee /tmp/body.gpg >>"$eml_file"
-			attach /tmp/body.gpg
+			echo "$body" | eval gpg2 --encrypt --armor --recipient "$recipient" "$sign_args" >>"$eml_file"
 		fi
 	else
 		if [ -f "$body" ]; then
