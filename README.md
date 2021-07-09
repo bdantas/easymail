@@ -16,4 +16,4 @@ Run the script without any arguments for syntax and example usage.
 If they are missing on your system (which is not advisable), you can still use this script. Just add *--insecure* to the curl command in the *send_eml_file* function.
 
 # Note about encrypting emails
-The encrypted body text will appear both in the email body as well as in an attachment called _body.gpg_. This is for convenience in case recipient needs to download the encrypted body to manually decrypt it (with _gpg2 --decrypt body.gpg_).
+The encrypted body text will appear both in the email body as well as in an attachment called _body.gpg_. This is for convenience in case recipient needs to download the encrypted body to manually decrypt it (like this: _$ gpg2 --decrypt body.gpg_).
